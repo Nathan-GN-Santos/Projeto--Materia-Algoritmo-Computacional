@@ -186,3 +186,103 @@ void pesquisarProduto(Produto lista[], int total) {
         printf("\n[ERRO] Opcao de busca invalida!\n");
     }
 }
+
+// 4. Atualizar os dados de um produto existente
+void atualizarProduto(Produto lista[], int total) {
+    if (total == 0) {
+        printf("\n[AVISO] Nenhum produto cadastrado para atualizar.\n");
+        return;
+    }
+
+    int codigo;
+    printf("\n--- ATUALIZAR PRODUTO ---\n");
+    printf("Digite o codigo do produto que deseja atualizar: ");
+    scanf("%d", &codigo);
+    limparBuffer();
+
+    int pos = buscarPorCodigo(lista, total, codigo);
+    if (pos == -1) {
+        printf("\n[ERRO] Produto com codigo %d nao encontrado!\n", codigo);
+        return;
+    }
+
+    printf("\nProduto encontrado. Insira os novos dados:\n");
+
+    // Validação do Novo Nome
+    do {
+        printf("Novo Nome: ");
+        fgets(lista[pos].nome, sizeof(lista[pos].nome), stdin);
+        lista[pos].nome[strcspn(lista[pos].nome, "\n")] = '\0';
+        if (strlen(lista[pos].nome) == 0) {
+            printf("[ERRO] O nome nao pode ficar em branco!\n");
+        }
+    } while (strlen(lista[pos].nome) == 0);
+
+    // Validação da Nova Prateleira
+    do {
+        printf("Nova Prateleira ('A', 'B', 'C' ou 'D'): ");
+        scanf(" %c", &lista[pos].prateleira);
+        lista[pos].prateleira = toupper(lista[pos].prateleira);
+        limparBuffer();
+
+        if (lista[pos].prateleira != 'A' && lista[pos].prateleira != 'B' && 
+            lista[pos].prateleira != 'C' && lista[pos].prateleira != 'D') {
+            printf("[ERRO] Prateleira invalida! Escolha apenas A, B, C ou D.\n");
+        }
+    } while (lista[pos].prateleira != 'A' && lista[pos].prateleira != 'B' && 
+             lista[pos].prateleira != 'C' && lista[pos].prateleira != 'D');
+
+    // Validação do Novo Preço
+    do {
+        printf("Novo Preco Unitario (R$): ");
+        scanf("%f", &lista[pos].preco);
+        limparBuffer();
+        if (lista[pos].preco <= 0.0f) {
+            printf("[ERRO] Preco deve ser maior que zero!\n");
+        }
+    } while (lista[pos].preco <= 0.0f);
+
+    // Validação da Nova Quantidade
+    do {
+        printf("Nova Quantidade em Estoque: ");
+        scanf("%d", &lista[pos].quantidade);
+        limparBuffer();
+        if (lista[pos].quantidade < 0) {
+            printf("[ERRO] Quantidade nao pode ser negativa!\n");
+        }
+    } while (lista[pos].quantidade < 0);
+
+    // Atualização automática da disponibilidade
+    lista[pos].disponivel = (lista[pos].quantidade > 0) ? 1 : 0;
+
+    printf("\n[SUCESSO] Produto atualizado com sucesso!\n");
+    exibirProduto(lista[pos]);
+}
+
+// 5. Remover um produto da lista pelo código
+int removerProduto(Produto lista[], int total) {
+    if (total == 0) {
+        printf("\n[AVISO] Nenhum produto cadastrado para remover.\n");
+        return total;
+    }
+
+    int codigo;
+    printf("\n--- REMOVER PRODUTO ---\n");
+    printf("Digite o codigo do produto que deseja remover: ");
+    scanf("%d", &codigo);
+    limparBuffer();
+
+    int pos = buscarPorCodigo(lista, total, codigo);
+    if (pos == -1) {
+        printf("\n[ERRO] Produto com codigo %d nao encontrado!\n", codigo);
+        return total;
+    }
+
+    // Desloca os elementos para preencher o espaço do produto removido
+    for (int i = pos; i < total - 1; i++) {
+        lista[i] = lista[i + 1];
+    }
+
+    printf("\n[SUCESSO] Produto removido com sucesso!\n");
+    return total - 1;
+}
