@@ -1,8 +1,7 @@
-#include <stdio.h>
-#include "util.h"
+#ifndef UTIL_H
+#define UTIL_H
 
 // A tal Função de Limpeza 
-void limparBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
+void limparBuffer();
+
+#endif

@@ -1,58 +1,108 @@
+//EXECUTAT
+//.\main.exe
+
+//Dicionário
+//Funções Nativas do C:
+// scanf = scan formatted, função que lê dados do teclado e  salva em uma variável.
+// fgets = file get string ,função que lê uma linha de texto do teclado e salva em uma variável do tipo string.
+
+//Especificadores:
+// %d = inteiro decimal
+
+//CÓDIGO
 #include <stdio.h>
-#include "produto.h" // Modificação: Inclui produto.h para acessar a struct Produto, CAPACIDADE e as funções do sistema
-#include "util.h"    // Modificação: Inclui util.h para ter acesso ao limparBuffer() após a leitura da opção do menu no scanf
+#include "produto.h"
+#include "categoria.h"
+#include "util.h"
 
 int main() {
+    // Configura a saída e entrada do console do Windows para a página de código UTF-8 (65001)
+    //SetConsoleOutputCP(65001);
+    //SetConsoleCP(65001);
+
     int opcao = 0;
+    int opcaoCat = 0;
+
+    Categoria listaCategorias[CAPACIDADE_CATEGORIAS];
+    int totalCategorias = 0;
+
     Produto listaProdutos[CAPACIDADE]; // Vetor com capacidade para 50 produtos
     int totalProdutos = 0;             // Contador de produtos cadastrados
 
+    // Carregar dados salvos nos arquivos ao iniciar o programa (Requisito da Tarefa 4)
+    totalCategorias = carregarCategoriasArquivo(listaCategorias);
+    totalProdutos = carregarProdutosArquivo(listaProdutos);
+
     do {
-        // Exibição do Menu Principal
+        // Exibição do Menu Principal conforme exigido na Tarefa 4
         printf("\n====================================\n");
         printf("       SISTEMA DE ESTOQUE - MENU    \n");
         printf("====================================\n");
         printf("1 - Cadastrar Produto\n");
         printf("2 - Listar Produtos\n");
         printf("3 - Pesquisar Produto\n");
-        printf("4 - Atualizar Produto\n");
-        printf("5 - Remover Produto\n");
-        printf("6 - Sair\n");
+        printf("4 - Categorias\n");
+        printf("5 - Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
         limparBuffer();
 
         switch (opcao) {
             case 1:
-                totalProdutos = cadastrarProduto(listaProdutos, totalProdutos);
+                totalProdutos = cadastrarProduto(listaProdutos, totalProdutos, listaCategorias, totalCategorias);
                 break;
 
             case 2:
-                listarProdutos(listaProdutos, totalProdutos);
+                listarProdutos(listaProdutos, totalProdutos, listaCategorias, totalCategorias);
                 break;
 
             case 3:
-                pesquisarProduto(listaProdutos, totalProdutos);
+                pesquisarProduto(listaProdutos, totalProdutos, listaCategorias, totalCategorias);
                 break;
 
             case 4:
-                atualizarProduto(listaProdutos, totalProdutos);
+                // Submenu de Categorias (Requisito da Tarefa 4)
+                do {
+                    printf("\n------------------------------------\n");
+                    printf("       SUBMENU - CATEGORIAS         \n");
+                    printf("------------------------------------\n");
+                    printf("1 - Cadastrar Categoria\n");
+                    printf("2 - Listar Categoria\n");
+                    printf("3 - Voltar\n");
+                    printf("Escolha uma opcao: ");
+                    scanf("%d", &opcaoCat);
+                    limparBuffer();
+
+                    switch (opcaoCat) {
+                        case 1:
+                            totalCategorias = cadastrarCategoria(listaCategorias, totalCategorias);
+                            break;
+                        case 2:
+                            listarCategorias(listaCategorias, totalCategorias);
+                            break;
+                        case 3:
+                            printf("\nVoltando ao menu principal...\n");
+                            break;
+                        default:
+                            printf("\n[ERRO] Opcao invalida! Escolha entre 1 e 3.\n");
+                            break;
+                    }
+                } while (opcaoCat != 3);
                 break;
 
             case 5:
-                totalProdutos = removerProduto(listaProdutos, totalProdutos);
-                break;
-
-            case 6:
-                printf("\nSaindo do sistema... \n");
+                // Salvar dados em arquivos de texto antes de sair (Requisito da Tarefa 4)
+                salvarCategoriasArquivo(listaCategorias, totalCategorias);
+                salvarProdutosArquivo(listaProdutos, totalProdutos);
+                printf("\nDados salvos com sucesso. Saindo do sistema...\n");
                 break;
 
             default:
-                printf("\n[ERRO] Opcao invalida! Escolha entre 1 e 6.\n");
+                printf("\n[ERRO] Opcao invalida! Escolha entre 1 e 5.\n");
                 break;
         }
 
-    } while (opcao != 6);
+    } while (opcao != 5);
 
     return 0;
 }
